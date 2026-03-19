@@ -1,0 +1,11 @@
+Wed Mar 18 23:28:16 +05 2026
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.2  0.1  21688 12540 ?        Ss   23:21   0:01 /sbin/init
+root           2  0.0  0.0   3120  2048 ?        Sl   23:21   0:00 /init
+root           6  0.0  0.0   3136  1792 ?        Sl   23:21   0:00 plan9 --control-socket 7 --log-level 4 --server-fd 8 --pipe-fd 10 --log-truncate
+root          49  0.0  0.2  50300 16256 ?        S<s  23:21   0:00 /usr/lib/systemd/systemd-journald
+root          95  0.0  0.0  24872  6016 ?        Ss   23:21   0:00 /usr/lib/systemd/systemd-udevd
+systemd+     163  0.0  0.1  21452 12928 ?        Ss   23:21   0:00 /usr/lib/systemd/systemd-resolved
+systemd+     164  0.0  0.0  91020  7680 ?        Ssl  23:21   0:00 /usr/lib/systemd/systemd-timesyncd
+root         170  0.0  0.0   4236  2560 ?        Ss   23:21   0:00 /usr/sbin/cron -f -P
+message+     171  0.0  0.0   9576  5120 ?        Ss   23:21   0:00 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
