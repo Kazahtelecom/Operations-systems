@@ -1,23 +1,27 @@
 #!/bin/bash
 set -euo pipefail
 
-LOG_DIR="${1:-./logs}"
-
-if [[ ! -d "$LOG_DIR" ]]; then
-    echo "Ошибка: директория '$LOG_DIR' не найдена"
-    exit 1
-fi
-
-echo "=== Статистика логов в $LOG_DIR ==="
-total=0
-
-for file in "$LOG_DIR"/*.log; do
-    if [[ -f "$file" ]]; then
-        count=$(wc -l < "$file")
-        printf "  %-30s %d строк\n" "$(basename "$file")" "$count"
-        total=$((total + count))
+# Функция 1: Валидация
+check_dir() {
+    local dir="$1"
+    if [[ ! -d "$dir" ]]; then
+        echo "Ошибка: '$dir' не директория."
+        exit 1
     fi
-done
+}
 
-echo "==========================="
-echo "Итого: $total строк в $(find "$LOG_DIR" -maxdepth 1 -name "*.log" | wc -l) файлах"
+# Функция 2: Анализ
+analyze_logs() {
+    local dir="$1"
+    echo "Анализ файлов в $dir..."
+    find "$dir" -maxdepth 1 -name "*.log" -exec wc -l {} +
+}
+
+# Основная логика
+main() {
+    local target_dir="${1:-./logs}"
+    check_dir "$target_dir"
+    analyze_logs "$target_dir"
+}
+
+main "$@"
