@@ -1,7 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "Привет, $(whoami)!"
-echo "Дата: $(date +%Y-%m-%d)"
-echo "Ядро: $(uname -r)"
-echo "Текущая директория: \"$PWD\""
+USER_NAME=$(whoami)
+CURRENT_DATE=$(date +%Y-%m-%d)
+KERNEL=$(uname -r)
+
+echo "Привет, $USER_NAME!"
+echo "Дата: $CURRENT_DATE"
+echo "Ядро: $KERNEL"
+echo "Текущая директория: $PWD"

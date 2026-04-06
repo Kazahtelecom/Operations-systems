@@ -1,23 +1,26 @@
 #!/bin/bash
 set -euo pipefail
 
-LOG_DIR="${1:-./logs}"
-
-if [[ ! -d "$LOG_DIR" ]]; then
-    echo "Ошибка: директория '$LOG_DIR' не найдена"
+# 1. Проверка: передан ли один аргумент
+if [[ $# -ne 1 ]]; then
+    echo "Использование: $0 <путь_к_файлу_лога>"
     exit 1
 fi
 
-echo "=== Статистика логов в $LOG_DIR ==="
-total=0
+LOG_FILE="$1"
 
-for file in "$LOG_DIR"/*.log; do
-    if [[ -f "$file" ]]; then
-        count=$(wc -l < "$file")
-        printf "  %-30s %d строк\n" "$(basename "$file")" "$count"
-        total=$((total + count))
-    fi
-done
+# 2. Проверка: существует ли файл и является ли он обычным файлом
+if [[ ! -f "$LOG_FILE" ]]; then
+    echo "Ошибка: Файл '$LOG_FILE' не найден."
+    exit 1
+fi
 
-echo "==========================="
-echo "Итого: $total строк в $(find "$LOG_DIR" -maxdepth 1 -name "*.log" | wc -l) файлах"
+echo "=== Анализ лога: $(basename "$LOG_FILE") ==="
+
+# Считаем общее количество строк
+LINE_COUNT=$(wc -l < "$LOG_FILE")
+echo "Всего записей: $LINE_COUNT"
+
+# Выводим топ-5 самых частых IP (первая колонка в логе)
+echo "--- Топ-5 активных IP ---"
+awk '{print $1}' "$LOG_FILE" | sort | uniq -c | sort -rn | head -n 5

@@ -1,17 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
-# Проверка наличия аргумента
-if [[ $# -eq 0 ]]; then
-    echo "Использование: $0 <файл>"
+if [[ $# -ne 1 ]]; then
+    echo "Использование: $0 <file>"
     exit 1
 fi
 
 FILE="$1"
 
-# Проверка существования файла
-if [[ ! -f "$FILE" ]]; then
-    echo "Ошибка: '$FILE' не найден или не является файлом"
+if [[ ! -e "$FILE" ]]; then
+    echo "Ошибка: '$FILE' не найден"
     exit 1
 fi
 
