@@ -1,0 +1,115 @@
+
+
+
+1. Inode original.txt: hello from original 
+2  Inode hard_link.txt : cat hard_link.txt
+hello from original
+3 Inode sym_link.txt: cat sym_link.txt
+cat: sym_link.txt: No such file or directory
+Как это все вышло? Я как понял hard_link txt не содал копию файла. Она создает второй имя которые указывает incode 
+А про симболик ( я честно немного не понял, но как я понял это просто отдельный файл который указывает на путь оригинала которого больше нет ) 
+
+Ошибка возникла, потому что /dev/sdc не содержит ext4 файловую систему (это swap).
+Команда tune2fs работает только с ext2/3/4.
+
+Разница возникает из-за специальных файловых систем (/proc, /mnt, 9p),
+которые не имеют обычного размера.
+
+Sparse file — это файл, который логически большой,
+но физически не занимает место, пока в него не записаны данные.
+Size: 100M
+Blocks: 0
+
+Режим journaling: data=ordered
+
+Он сначала записывает данные, затем метаданные.
+Это защищает от повреждения файлов и является компромиссом между
+производительностью и безопасностью.
+
+
+Inode могут закончиться раньше места,
+если создаётся очень много маленьких файлов.
+
+
+Файловая система выделяет место блоками (обычно 4096 байт).
+Даже если файл содержит 1 байт, он занимает целый блок.
+Это упрощает управление диском и ускоряет работу.
+
+kz444gron@jasulan:~/os-kaznu-2026/lab03$ nano fs_quick_report.sh
+kz444gron@jasulan:~/os-kaznu-2026/lab03$ ./fs_quick_report.sh /etc
+-bash: ./fs_quick_report.sh: Permission denied
+kz444gron@jasulan:~/os-kaznu-2026/lab03$ ./fs_quick_report.sh
+-bash: ./fs_quick_report.sh: Permission denied
+kz444gron@jasulan:~/os-kaznu-2026/lab03$ ./fs_quick_report.sh /tmp/no_such_dir
+-bash: ./fs_quick_report.sh: Permission denied
+kz444gron@jasulan:~/os-kaznu-2026/lab03$ shellcheck fs_quick_report.sh
+kz444gron@jasulan:~/os-kaznu-2026/lab03$ chmod +x fs_quick_report.sh
+kz444gron@jasulan:~/os-kaznu-2026/lab03$ ./fs_quick_report.sh /etc
+=== ФС отчёт ===
+
+--- Смонтированные ФС ---
+Filesystem     Type     Size  Used Avail Use% Mounted on
+none           tmpfs    3.9G  4.0K  3.9G   1% /mnt/wsl
+/dev/sdd       ext4    1007G  1.8G  954G   1% /
+none           tmpfs    3.9G  144K  3.9G   1% /mnt/wslg
+none           tmpfs    3.9G  544K  3.9G   1% /run
+none           tmpfs    3.9G     0  3.9G   0% /run/lock
+none           tmpfs    3.9G     0  3.9G   0% /run/shm
+tmpfs          tmpfs    782M   20K  782M   1% /run/user/1000
+
+--- Статистика: /etc ---
+  Файлов:     680
+  Директорий: 169
+  Симлинков:   530
+
+--- Топ-3 крупнейших файла ---
+  Inode      Размер Путь
+  1174       215Ki        /etc/ssl/certs/ca-certificates.crt
+  769        74Ki         /etc/mime.types
+  18465      32Ki         /etc/apparmor.d/usr.lib.snapd.snap-confine.real
+kz444gron@jasulan:~/os-kaznu-2026/lab03$ ./fs_quick_report.sh
+=== ФС отчёт ===
+
+--- Смонтированные ФС ---
+Filesystem     Type     Size  Used Avail Use% Mounted on
+none           tmpfs    3.9G  4.0K  3.9G   1% /mnt/wsl
+/dev/sdd       ext4    1007G  1.8G  954G   1% /
+none           tmpfs    3.9G  144K  3.9G   1% /mnt/wslg
+none           tmpfs    3.9G  544K  3.9G   1% /run
+none           tmpfs    3.9G     0  3.9G   0% /run/lock
+none           tmpfs    3.9G     0  3.9G   0% /run/shm
+tmpfs          tmpfs    782M   20K  782M   1% /run/user/1000
+
+--- Статистика: /etc ---
+  Файлов:     680
+  Директорий: 169
+  Симлинков:   530
+
+--- Топ-3 крупнейших файла ---
+  Inode      Размер Путь
+  1174       215Ki        /etc/ssl/certs/ca-certificates.crt
+  769        74Ki         /etc/mime.types
+  18465      32Ki         /etc/apparmor.d/usr.lib.snapd.snap-confine.real
+
+
+
+
+
+
+kz444gron@jasulan:~/lab03$ df -Th /
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sdd       ext4 1007G  1.8G  954G   1% /
+
+
+
+
+
+
+
+-rw-r--r--  1 kz444gron kz444gron   20 Apr  7 13:36 hard_link.txt
+-rw-r--r--  1 kz444gron kz444gron  640 Apr  7 14:06 links_report.txt
+lrwxrwxrwx  1 kz444gron kz444gron   12 Apr  7 13:39 sym_link.txt -> original.txt
+kz444gron@jasulan:~/lab03$ cd ..
+kz444gron@jasulan:~$ cd os-kaznu-2026/
+kz444gron@jasulan:~/os-kaznu-2026$ ls -la
+
