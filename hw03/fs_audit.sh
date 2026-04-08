@@ -11,9 +11,18 @@ show_dir_stats() {
     local dir="$1"
 
     echo "=== Статистика: $dir ==="
-    echo "  Файлов:      $(find "$dir" -type f 2>/dev/null | wc -l)"
-    echo "  Директорий:  $(find "$dir" -type d 2>/dev/null | wc -l)"
-    echo "  Симлинков:   $(find "$dir" -type l 2>/dev/null | wc -l)"
+
+    local file_count
+    local dir_count
+    local link_count
+
+    file_count=$(find "$dir" -type f 2>/dev/null | wc -l)
+    dir_count=$(find "$dir" -type d 2>/dev/null | wc -l)
+    link_count=$(find "$dir" -type l 2>/dev/null | wc -l)
+
+    echo "  Файлов:      $file_count"
+    echo "  Директорий:  $dir_count"
+    echo "  Симлинков:   $link_count"
     echo ""
 }
 
@@ -47,7 +56,12 @@ show_df_vs_du() {
     du_used=$(sudo du -sk / 2>/dev/null | awk '{print $1}')
 
     diff=$((df_used - du_used))
-    percent=$((diff * 100 / df_used))
+
+    if [[ "$df_used" -gt 0 ]]; then
+        percent=$((diff * 100 / df_used))
+    else
+        percent=0
+    fi
 
     echo "  df used:   ${df_used} KB"
     echo "  du used:   ${du_used} KB"
@@ -56,21 +70,23 @@ show_df_vs_du() {
 }
 
 main() {
+    # Проверка аргумента
     if [[ $# -lt 1 ]]; then
-        echo "Использование: $0 <directory>"
+        echo "Использование: $0 <директория>"
         exit 1
     fi
 
-    local target="$1"
+    local TARGET_DIR="$1"
 
-    if [[ ! -d "$target" ]]; then
-        echo "Ошибка: директория '$target' не существует" >&2
+    # Проверка, что это директория
+    if [[ ! -d "$TARGET_DIR" ]]; then
+        echo "Ошибка: '$TARGET_DIR' не является директорией." >&2
         exit 1
     fi
 
     show_mounted_fs
-    show_dir_stats "$target"
-    show_top_files "$target"
+    show_dir_stats "$TARGET_DIR"
+    show_top_files "$TARGET_DIR"
     show_df_vs_du
 }
 
