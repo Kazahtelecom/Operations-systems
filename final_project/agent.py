@@ -33,10 +33,17 @@ def process_list() -> dict:
     return {"top_processes": result.stdout.split('\n')[1:6]}
 
 def disk_usage(path: str = "/") -> dict:
-    total, used, free = os.statvfs(path)[:3]
-    g = 1024**3
-    return {"total_gb": round((total * used) / g, 2), "free_gb": round((total * free) / g, 2)}
-
+    import shutil
+    try:
+        total, used, free = shutil.disk_usage(path)
+        gb = 1024**3
+        return {
+            "total_gb": round(total / gb, 2),
+            "used_gb": round(used / gb, 2),
+            "free_gb": round(free / gb, 2)
+        }
+    except Exception as e:
+        return {"error": str(e)}
 def find_files(directory: str, pattern: str) -> dict:
     import glob
     matches = glob.glob(os.path.join(directory, "**", pattern), recursive=True)
